@@ -1,14 +1,13 @@
 package lt.viko.eif.tpetrauskas.aes;
 
-import javax.crypto.Cipher;
+import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.util.Arrays;
 import java.util.Base64;
 
-public class AES {
+public class ECB {
     private static SecretKeySpec secretKey;
     private static byte[] key;
 
@@ -27,10 +26,10 @@ public class AES {
         }
     }
 
-    public static String encrypt(String strToEncrypt, String secret, String mode) {
+    public static String encrypt(String strToEncrypt, String secret) {
         try {
             setKey(secret);
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
         } catch (Exception e) {
@@ -50,4 +49,5 @@ public class AES {
         }
         return null;
     }
+
 }
