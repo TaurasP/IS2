@@ -11,9 +11,11 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
+    public static boolean exit = false;
+
     public static void main(String[] args) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, InvalidKeySpecException {
 
-        while(true) {
+        while(!exit) {
             //showMenu();
             selectFromMenu();
         }
@@ -33,11 +35,13 @@ public class Main {
         System.out.println("1. Uzkoduoti/atkoduoti.");
         System.out.println("2. Nuskaityti teksta is failo.");
         System.out.println("********************************");
+        System.out.println("0. Isjungti programa.");
+        System.out.println("********************************");
     }
 
     public static void selectFromMenu() throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, InvalidKeySpecException {
         Scanner input = new Scanner(System.in);
-        while(true) {
+        while(!exit) {
             showMenu();
             System.out.println("Pasirinkite menu punkta: ");
             try {
@@ -48,6 +52,9 @@ public class Main {
                         break;
                     case 2:
                         showFileScanOption();
+                        break;
+                    case 0:
+                        exit = true;
                         break;
                     default:
                         break;
