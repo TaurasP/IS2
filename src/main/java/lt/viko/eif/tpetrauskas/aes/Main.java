@@ -89,7 +89,7 @@ public class Main {
     }
 
     public static void showFileScanOption() {
-        //System.out.println("Nuskaitymas is failo.");
+        System.out.print("Nuskaitytas uzsifruotas tekstas is failo aes.txt: ");
         readFromFile("aes.txt");
     }
 
