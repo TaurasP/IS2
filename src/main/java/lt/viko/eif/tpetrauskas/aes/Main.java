@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -16,6 +15,9 @@ import java.util.Scanner;
 
 public class Main {
     public static boolean exit = false;
+    public static String savedFileAlgorithm = "";
+    public static String saveFileSecretKey = "";
+    public static IvParameterSpec savedFileIvParamSpec = null;
 
     public static void main(String[] args) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, InvalidKeySpecException {
 
@@ -23,14 +25,6 @@ public class Main {
             //showMenu();
             selectFromMenu();
         }
-
-        // teksta, key
-        // mode pasirinkimas
-        // encode/decode
-        // default issaugoti faile
-        // galimybe nuskaityti faila
-
-        // sifruoti failo turini, ne faila
     }
 
     public static void showMenu() {
@@ -79,6 +73,7 @@ public class Main {
 
         System.out.println("Iveskite rakta: ");
         String secretKey = input.nextLine();
+        //saveFileSecretKey = secretKey;
 
         showAESModesMenu();
         String algorithm = selectAESAlgorithm();
@@ -88,7 +83,7 @@ public class Main {
         selectEncodeOrDecode(originalString, secretKey, algorithm);
     }
 
-    public static void showFileScanOption() {
+    public static void showFileScanOption() throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeySpecException, InvalidKeyException {
         System.out.print("Nuskaitytas uzsifruotas tekstas is failo aes.txt: ");
         readFromFile("aes.txt");
     }
@@ -134,12 +129,17 @@ public class Main {
             IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidKeySpecException {
 
         if(algorithm.equals("ECB")) {
+            saveFileSecretKey = secretKey;
+            savedFileAlgorithm = algorithm;
             String encryptedString = ECB.encrypt(originalString, secretKey);
             String decryptedString = ECB.decrypt(encryptedString, secretKey);
             printEncodeOrDecode(originalString, encryptedString, decryptedString);
         }
         if(algorithm.equals("CBC")) {
+            saveFileSecretKey = secretKey;
+            savedFileAlgorithm = algorithm;
             IvParameterSpec ivParameterSpec = CBC.generateIv();
+            savedFileIvParamSpec = ivParameterSpec;
             String encryptedString = CBC.encrypt(originalString, secretKey, ivParameterSpec);
             String decryptedString = CBC.decrypt(encryptedString, secretKey, ivParameterSpec);
             printEncodeOrDecode(originalString, encryptedString, decryptedString);
@@ -172,30 +172,30 @@ public class Main {
 
     public static void saveToFile(String encryptedText, String fileName) {
         try {
-            //File file = new File("aes.txt");
             FileWriter myWriter = new FileWriter(fileName);
             myWriter.write(encryptedText);
             myWriter.close();
-            //System.out.println("Successfully wrote to the file.");
-
-            /*if (file.createNewFile()) {
-                System.out.println("File created: " + file.getName());
-            } else {
-                System.out.println("File already exists.");
-            }*/
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
     }
 
-    public static void readFromFile(String fileName) {
+    public static void readFromFile(String fileName) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeySpecException, InvalidKeyException {
         try {
             File file = new File(fileName);
             Scanner myReader = new Scanner(file);
             while (myReader.hasNextLine()) {
-                String data = myReader.nextLine();
-                System.out.println(data);
+                String encryptedString = myReader.nextLine();
+
+                if(savedFileAlgorithm.equals("ECB")) {
+                    String decryptedString = ECB.decrypt(encryptedString, saveFileSecretKey);
+                    System.out.println(decryptedString);
+                }
+                if(savedFileAlgorithm.equals("CBC")) {
+                    String decryptedString = CBC.decrypt(encryptedString, saveFileSecretKey, savedFileIvParamSpec);
+                    System.out.println(decryptedString);
+                }
             }
             myReader.close();
         } catch (FileNotFoundException e) {
